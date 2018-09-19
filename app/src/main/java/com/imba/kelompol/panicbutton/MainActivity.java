@@ -1,5 +1,6 @@
 package com.imba.kelompol.panicbutton;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -17,12 +18,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.imba.kelompol.panicbutton.API.EndpointEmeract;
+import com.imba.kelompol.panicbutton.API.RetrofitClient;
+import com.imba.kelompol.panicbutton.Models.API.Article.Article;
+import com.imba.kelompol.panicbutton.Models.API.Article.ArticleResponse;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private SlidingUpPanelLayout mLayout;
     boolean doubleBackToExitPressedOnce = false;
+
+    private final String NEWS_DATA_RESPONSE = "NEWS_DATA_RESPONSE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +65,27 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
+
+        // Debug
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading....");
+        progressDialog.show();
+        Log.d(NEWS_DATA_RESPONSE,"=== BEGIN ===");
+        EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
+        Call<ArticleResponse> call = service.getListNews();
+        call.enqueue(new Callback<ArticleResponse>() {
+            @Override
+            public void onResponse(Call<ArticleResponse> call, Response<ArticleResponse> response) {
+                progressDialog.dismiss();
+                Log.d(NEWS_DATA_RESPONSE,response.body().toString());
+                generateRecyclerNews(response.body().getArticles());
+            }
+
+            @Override
+            public void onFailure(Call<ArticleResponse> call, Throwable t) {
+                Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
             }
         });
     }
@@ -152,4 +186,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    /*
+    * Functional
+    * */
+    private void generateRecyclerNews(List<Article> list){
+
+    }
 }
