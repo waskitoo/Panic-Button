@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imba.kelompol.panicbutton.API.EndpointEmeract;
@@ -24,7 +25,9 @@ import com.imba.kelompol.panicbutton.Models.API.Article.Article;
 import com.imba.kelompol.panicbutton.Models.API.Article.ArticleResponse;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,6 +39,9 @@ public class MainActivity extends AppCompatActivity
     boolean doubleBackToExitPressedOnce = false;
 
     private final String NEWS_DATA_RESPONSE = "NEWS_DATA_RESPONSE";
+    private final String WEATHER_DATA_RESPONSE = "WEATHER_DATA_RESPONSE";
+
+    private TextView lblWTemp1, lblWTemp0, lblWLoc0, lblWLoc1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +74,11 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        lblWTemp1 = findViewById(R.id.weatherTemp1);
+        lblWLoc1 = findViewById(R.id.weatherLoc1);
+        lblWTemp0 = findViewById(R.id.wheatherTemp);
+        lblWLoc0 = findViewById(R.id.wheatherLoc);
+
         // Debug
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading....");
@@ -86,6 +97,28 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<ArticleResponse> call, Throwable t) {
                 Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
+            }
+        });
+
+        Call<Map<String,Object>> weatherCall = service.getCurrentWeather();
+        weatherCall.enqueue(new Callback<Map<String,Object>>() {
+            @Override
+            public void onResponse(Call<Map<String,Object>> call, Response<Map<String,Object>> response) {
+                Map<String,Object> item = (Map)response.body().get("data");
+                Log.d(WEATHER_DATA_RESPONSE, response.body().toString());
+                String temp,loc;
+                temp=((Map)item.get("main")).get("temp").toString();
+                loc=item.get("name").toString();
+                lblWTemp1.setText(temp+"℃");
+                lblWLoc1.setText(loc);
+
+                lblWTemp0.setText(temp+"℃");
+                lblWLoc0.setText(loc);
+            }
+
+            @Override
+            public void onFailure(Call<Map<String,Object>> call, Throwable t) {
+                Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
             }
         });
     }
