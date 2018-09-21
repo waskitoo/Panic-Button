@@ -35,13 +35,12 @@
                     android:orientation="vertical"
                     android:gravity="center"
                     android:layout_gravity="right"
-                    android:paddingRight="30dp"
+                    android:layout_marginRight="30dp"
                     android:paddingTop="-15dp">
                     <TextView
                         android:id="@+id/weatherTemp1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-
                         android:text="30"
                         android:textSize="50dp"
 
@@ -108,7 +107,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="-50dp"
             android:gravity="center">
             <ImageView
                 android:id="@+id/weather"
@@ -127,8 +125,7 @@
                 android:paddingTop="110dp"
                 android:gravity="center"
                 android:textSize="60dp"
-                android:text="30"
-                android:textColor="#FFFF" />
+                android:text="30"/>
             <TextView
                 android:id="@+id/wheatherLoc"
                 android:layout_width="wrap_content"
@@ -148,6 +145,7 @@
                 android:textSize="20dp"
                 android:text="NEWS"/>
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/RVnews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

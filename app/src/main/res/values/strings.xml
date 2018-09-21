@@ -11,4 +11,25 @@
     <string name="action_hide">Hide Panel</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="sumber">
+        <item>Kompas</item>
+        <item>Detik</item>
+        <item>UwU News</item>
+        <item>OwO News</item>
+        <item>UmU News</item>
+        <item>Nero News</item>
+        <item>Saber News</item>
+        <item>Mashu News</item>
+    </string-array>
+    <string-array name="berita">
+        <item>Ada Semut Di sempak dan menggigit sebuah barang yang dapat menyengat dan memberi dampak pada teman pangguna</item>
+        <item>Macet Gara Gara Kodong yang menyebrang ke depan Jalan Sukabirus untuk memeli Jus Melon </item>
+        <item>Ada Semut Di sempak dan menggigit sebuah barang yang dapat menyengat dan memberi dampak pada teman pangguna</item>
+        <item>Macet Gara Gara Kodong yang menyebrang ke depan Jalan Sukabirus untuk memeli Jus Melon</item>
+        <item>Ada Semut Di sempak dan menggigit sebuah barang yang dapat menyengat dan memberi dampak pada teman pangguna</item>
+        <item>Macet Gara Gara Kodong yang menyebrang ke depan Jalan Sukabirus untuk memeli Jus Melon</item>
+        <item>Ada Semut Di sempak dan menggigit sebuah barang yang dapat menyengat dan memberi dampak pada teman pangguna</item>
+        <item>Macet Gara Gara Kodong yang menyebrang ke depan Jalan Sukabirus untuk memeli Jus Melon</item>
+    </string-array>
 </resources>

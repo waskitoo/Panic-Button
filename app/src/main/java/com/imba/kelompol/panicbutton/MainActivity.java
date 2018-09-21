@@ -1,11 +1,14 @@
 package com.imba.kelompol.panicbutton;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -25,6 +28,7 @@ import com.imba.kelompol.panicbutton.Models.API.Article.Article;
 import com.imba.kelompol.panicbutton.Models.API.Article.ArticleResponse;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,10 @@ public class MainActivity extends AppCompatActivity
     private final String NEWS_DATA_RESPONSE = "NEWS_DATA_RESPONSE";
     private final String WEATHER_DATA_RESPONSE = "WEATHER_DATA_RESPONSE";
 
+    private List<String> sumberBerita;
+    private List<String> isiBerita;
+    private BeritaAdapter mAdapter;
+
     private TextView lblWTemp1, lblWTemp0, lblWLoc0, lblWLoc1;
 
     @Override
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //Design
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.mainLayout);
         mLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -121,6 +130,14 @@ public class MainActivity extends AppCompatActivity
                 Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
             }
         });
+        isiBerita = Arrays.asList(getResources().getStringArray(R.array.berita));
+        sumberBerita = Arrays.asList(getResources().getStringArray(R.array.sumber));
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.RVnews);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new BeritaAdapter(isiBerita,sumberBerita, this);
+        recyclerView.setAdapter(mAdapter);
+
+
     }
 
     @Override
