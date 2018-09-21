@@ -33,6 +33,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*
+* TAMBAHIN RECYCLERVIEW NYA COK
+* */
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private SlidingUpPanelLayout mLayout;
