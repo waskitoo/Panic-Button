@@ -9,18 +9,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.imba.kelompol.panicbutton.Models.API.Article.Article;
+
 import java.util.List;
 
 public class BeritaAdapter extends RecyclerView.Adapter<BeritaAdapter.MyViewHolder> {
     private Context context;
     private List<String> dataBerita;
     private List<String> dataLink;
+    private List<Article> dataArticles;
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private TextView Berita,LinkBerita;
+        private TextView Berita,LinkBerita, BeritaTitle;
         private CardView CVBerita;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            BeritaTitle =(TextView)itemView.findViewById(R.id.BeritaTitle);
             Berita =(TextView)itemView.findViewById(R.id.Berita);
             LinkBerita = (TextView)itemView.findViewById(R.id.LinkBerita);
             CVBerita = (CardView)itemView.findViewById(R.id.CVBerita);
@@ -31,6 +35,11 @@ public class BeritaAdapter extends RecyclerView.Adapter<BeritaAdapter.MyViewHold
         this.dataLink = dataLink;
         this.context = context;
     }
+    public BeritaAdapter(List<Article> dataArticles, Context context){
+        this.dataArticles = dataArticles;
+        this.context = context;
+    }
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -41,14 +50,27 @@ public class BeritaAdapter extends RecyclerView.Adapter<BeritaAdapter.MyViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        final String listBerita = dataBerita.get(position);
-        final String listLink = dataLink.get(position);
-        holder.Berita.setText(""+listBerita);
-        holder.LinkBerita.setText(""+listLink);
+        if(this.dataArticles == null){
+            final String listBerita = dataBerita.get(position);
+            final String listLink = dataLink.get(position);
+            holder.Berita.setText(""+listBerita);
+            holder.LinkBerita.setText(""+listLink);
+        }else{
+            Article article = dataArticles.get(position);
+            holder.BeritaTitle.setText(article.getTitle());
+            holder.Berita.setText(article.getDescription());
+            holder.LinkBerita.setText(article.getUrl());
+        }
     }
 
     @Override
-    public int getItemCount() { return dataBerita.size();}
+    public int getItemCount() {
+        if(this.dataArticles == null){
+            return dataBerita.size();
+        }else{
+            return dataArticles.size();
+        }
+    }
 
 
 }

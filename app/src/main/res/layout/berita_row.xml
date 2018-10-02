@@ -16,23 +16,26 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="12dp"
+            >
 
             <TextView
+                android:id="@+id/BeritaTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="left"
                 android:textSize="20dp"
-                android:text="Alolololo"
+                android:layout_marginBottom="10dp"
+                android:text="Judul Berita"
                 android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/Berita"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
                 android:gravity="left|center"
-                android:text="Ada Semut Di sempak dan menggigit sebuah barang yang dapat menyengat dan memberi dampak pada teman pangguna"
+                android:text="Deskripsi Berita..."
                 android:textSize="20dp" />
 
             <TextView
@@ -43,7 +46,7 @@
                 android:gravity="right|bottom"
                 android:paddingTop="10dp"
                 android:paddingRight="8dp"
-                android:text="asdawasdwa" />
+                android:text="Sumber" />
 
         </LinearLayout>
 

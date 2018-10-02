@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private BeritaAdapter mAdapter;
 
     private TextView lblWTemp1, lblWTemp0, lblWLoc0, lblWLoc1;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity
         });
         isiBerita = Arrays.asList(getResources().getStringArray(R.array.berita));
         sumberBerita = Arrays.asList(getResources().getStringArray(R.array.sumber));
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.RVnews);
+        recyclerView = (RecyclerView)findViewById(R.id.RVnews);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new BeritaAdapter(isiBerita,sumberBerita, this);
         recyclerView.setAdapter(mAdapter);
@@ -240,6 +241,7 @@ public class MainActivity extends AppCompatActivity
     * Functional
     * */
     private void generateRecyclerNews(List<Article> list){
-
+        mAdapter = new BeritaAdapter(list, this);
+        recyclerView.setAdapter(mAdapter);
     }
 }
