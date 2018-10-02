@@ -6,20 +6,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.imba.kelompol.panicbutton.API.RoutesConf;
 
 public class LandingActivity extends AppCompatActivity {
 
-    private Button btnLoginG, btnLoginF, btnLoginT;
+    private ImageView btnLoginG, btnLoginF, btnLoginT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_landing);
-        btnLoginF = (Button)findViewById(R.id.btnLoginFB);
-        btnLoginG = (Button)findViewById(R.id.btnLoginGoogle);
-        btnLoginT = (Button)findViewById(R.id.btnLoginTwitter);
+        setContentView(R.layout.activity_sign_in);
+        btnLoginF = (ImageView)findViewById(R.id.facebookLogin);
+        btnLoginG = (ImageView)findViewById(R.id.googleLogin);
+        btnLoginT = (ImageView)findViewById(R.id.twitterLogin);
 
         btnLoginG.setOnClickListener(new View.OnClickListener() {
             @Override

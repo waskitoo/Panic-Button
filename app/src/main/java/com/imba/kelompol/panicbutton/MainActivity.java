@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -139,7 +140,8 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new BeritaAdapter(isiBerita,sumberBerita, this);
         recyclerView.setAdapter(mAdapter);
 
-
+        // User Mount
+        callService();
     }
 
     @Override
@@ -245,5 +247,41 @@ public class MainActivity extends AppCompatActivity
     private void generateRecyclerNews(List<Article> list){
         mAdapter = new BeritaAdapter(list, this);
         recyclerView.setAdapter(mAdapter);
+    }
+
+
+    private void callService(){
+        EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
+        Call<Map<String,Object>> call = service.getUserLogged();
+        call.enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                Map<String,Object> res = response.body();
+                if(res.get("success")!=null && (Boolean)res.get("success")==true){
+                    Map<String,Object> user = (Map)res.get("credential");
+                    String html = "";
+                    html += "Name: "+user.get("name");
+                    html += "\nEmail: "+user.get("email");
+                    html += "\nID: "+user.get("token");
+                    Log.d("USER_LOGIN","Info: "+html);
+                    showDialog(html, "User Login");
+                }
+                Log.d("USER_LOGIN","Info: "+res.toString());
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Log.e("USER_LOGIN","Error: "+t.getMessage());
+            }
+        });
+    }
+
+
+    private void showDialog(String msg, String title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(msg);
+        builder.setTitle(title);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
