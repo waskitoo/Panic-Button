@@ -9,6 +9,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface EndpointEmeract {
     // Weather
@@ -20,8 +21,8 @@ public interface EndpointEmeract {
     Call<ArticleResponse> getListNews();
 
     // User Login
-    @GET("/auth/user/success")
-    Call<Map<String,Object>> getUserLogged();
+    @GET("/auth/user/credential")
+    Call<Map<String,Object>> getUserLogged(@Query("providerId") String userProviderId);
 
     // User Logout
 //    @POST("/logout")

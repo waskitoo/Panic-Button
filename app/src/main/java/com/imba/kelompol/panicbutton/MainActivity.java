@@ -3,6 +3,7 @@ package com.imba.kelompol.panicbutton;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 
 import com.imba.kelompol.panicbutton.API.EndpointEmeract;
 import com.imba.kelompol.panicbutton.API.RetrofitClient;
+import com.imba.kelompol.panicbutton.API.RoutesConf;
 import com.imba.kelompol.panicbutton.Models.API.Article.Article;
 import com.imba.kelompol.panicbutton.Models.API.Article.ArticleResponse;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -51,8 +53,14 @@ public class MainActivity extends AppCompatActivity
     private List<String> isiBerita;
     private BeritaAdapter mAdapter;
 
+    // Activity Comp.
     private TextView lblWTemp1, lblWTemp0, lblWLoc0, lblWLoc1;
+    // Nav Comp.
+    private NavigationView navigationView;
+    private TextView lblNavUserName, lblNavUserEmail;
     private RecyclerView recyclerView;
+
+    private SharedPreferences prefShared;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +73,15 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        // Sign In/Out Menu
+        navigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+        navigationView.getMenu().findItem(R.id.nav_logout).setVisible(false);
+        View headerView = navigationView.getHeaderView(0);
+        lblNavUserName = headerView.findViewById(R.id.navLblUserName);
+        lblNavUserEmail = headerView.findViewById(R.id.navLblUserEmail);
+
         //Design
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.mainLayout);
         mLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
@@ -86,6 +101,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        prefShared = getSharedPreferences(RoutesConf.API_SHARED_USER,0);
         lblWTemp1 = findViewById(R.id.weatherTemp1);
         lblWLoc1 = findViewById(R.id.weatherLoc1);
         lblWTemp0 = findViewById(R.id.wheatherTemp);
@@ -183,6 +199,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_login) {
             startActivity(new Intent(this,LandingActivity.class));
         }
+        else if(id == R.id.nav_logout){
+            startActivity(new Intent(this, LogoutWebActivity.class));
+        }
 //        else if (id == R.id.nav_gallery) {
 //
 //        } else if (id == R.id.nav_slideshow) {
@@ -252,28 +271,36 @@ public class MainActivity extends AppCompatActivity
 
     private void callService(){
         EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
-        Call<Map<String,Object>> call = service.getUserLogged();
-        call.enqueue(new Callback<Map<String, Object>>() {
-            @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                Map<String,Object> res = response.body();
-                if(res.get("success")!=null && (Boolean)res.get("success")==true){
-                    Map<String,Object> user = (Map)res.get("credential");
+        String userProviderId = prefShared.getString("USER_PROVIDER_ID", null);
+        Log.d("USER_PROVIDER_ID",userProviderId);
+        if(userProviderId!=null) {
+            Call<Map<String, Object>> call = service.getUserLogged(userProviderId);
+            call.enqueue(new Callback<Map<String, Object>>() {
+                @Override
+                public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                    Map<String, Object> res = response.body();
+                if(res.get("status")!=null && (Boolean)res.get("status")==true && res.get("user")!=null){
+                    Map<String,Object> user = (Map)res.get("user");
                     String html = "";
                     html += "Name: "+user.get("name");
                     html += "\nEmail: "+user.get("email");
-                    html += "\nID: "+user.get("token");
+                    html += "\nID: "+user.get("provider_id");
                     Log.d("USER_LOGIN","Info: "+html);
                     showDialog(html, "User Login");
-                }
-                Log.d("USER_LOGIN","Info: "+res.toString());
-            }
+                    setPropUserNav(""+user.get("name"),""+user.get("email"));
 
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                Log.e("USER_LOGIN","Error: "+t.getMessage());
-            }
-        });
+                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                    navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
+                }
+                    Log.d("USER_LOGIN", "Info: " + res);
+                }
+
+                @Override
+                public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                    Log.e("USER_LOGIN", "Error: " + t.getMessage());
+                }
+            });
+        }
     }
 
 
@@ -283,5 +310,10 @@ public class MainActivity extends AppCompatActivity
         builder.setTitle(title);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void setPropUserNav(String name, String email){
+        lblNavUserEmail.setText(email);
+        lblNavUserName.setText(name);
     }
 }
