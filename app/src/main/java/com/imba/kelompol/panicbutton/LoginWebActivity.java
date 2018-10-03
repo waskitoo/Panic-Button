@@ -53,18 +53,27 @@ public class LoginWebActivity extends AppCompatActivity {
                 Log.i("URL_OPEN_WEB", url);
                 String key = "/auth/user/success";
                 if (url.contains(key)) {
-                    Toast.makeText(LoginWebActivity.this, "You're Already Sign-in", Toast.LENGTH_SHORT).show();
                     CookieManager cookieManager = CookieManager.getInstance();
                     String cookie = cookieManager.getCookie(url);
-                    String userProviderID = cookie.substring(cookie.indexOf("userProviderId"));
-                    userProviderID = userProviderID.substring(userProviderID.indexOf("=")+1,userProviderID.indexOf(";"));
                     Log.d("COOKIE_MANAGEMENT",cookie);
+                    String userProviderID="";
+                    try {
+                        userProviderID = cookie.substring(cookie.indexOf("userProviderId"));
+                        if(userProviderID.indexOf(";")>=0){
+                            userProviderID = userProviderID.substring(userProviderID.indexOf("=") + 1, userProviderID.indexOf(";"));
+                        }else{
+                            userProviderID = userProviderID.substring(userProviderID.indexOf("=") + 1);
+                        }
+                        prefEditor.putString("USER_COOKIE",""+cookie);
+                        prefEditor.putString("USER_PROVIDER_ID",""+userProviderID);
+                        prefEditor.apply();
+                        Toast.makeText(LoginWebActivity.this, "You're Already Sign-in", Toast.LENGTH_SHORT).show();
+                    }catch (Exception ex){
+                        Log.e("COOKIE_MANAGEMENT","Error: "+ex.getMessage());
+                    }
                     Log.d("COOKIE_MANAGEMENT_UPID",userProviderID);
 
-                    prefEditor.putString("USER_COOKIE",cookie);
-                    prefEditor.putString("USER_PROVIDER_ID",userProviderID);
-                    prefEditor.apply();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(LoginWebActivity.this, MainActivity.class));
                     LoginWebActivity.this.finish();
                     return true;
                 }
