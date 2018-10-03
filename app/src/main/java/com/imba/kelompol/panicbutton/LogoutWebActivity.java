@@ -24,10 +24,10 @@ public class LogoutWebActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_web);
 
         webView = (WebView) findViewById(R.id.webviewLogin);
-        prefEditor = getSharedPreferences(RoutesConf.API_SHARED_USER,0).edit();
+        prefEditor = getSharedPreferences(RoutesConf.API_SHARED_USER, 0).edit();
 
         // Get Passing Param
-        String url = RoutesConf.API_BASE_URL+"logout";
+        String url = RoutesConf.API_BASE_URL + "auth/user/logout";
 
         // WebView
         WebSettings webSettings = webView.getSettings();
@@ -35,27 +35,16 @@ public class LogoutWebActivity extends AppCompatActivity {
         webSettings.setUserAgentString("Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36");
         webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                Log.i("URL_OPEN_WEB", url);
-//                String key = "/auth/user/success";
-//                if (url.contains(key)) {
-//                    Toast.makeText(LoginWebActivity.this, "You're Already Sign-in", Toast.LENGTH_SHORT).show();
-//                    CookieManager cookieManager = CookieManager.getInstance();
-//                    String cookie = cookieManager.getCookie(url);
-//                    String userProviderID = cookie.substring(cookie.indexOf("userProviderId"));
-//                    userProviderID = userProviderID.substring(userProviderID.indexOf("=")+1,userProviderID.indexOf(";"));
-//                    Log.d("COOKIE_MANAGEMENT",cookie);
-//                    Log.d("COOKIE_MANAGEMENT_UPID",userProviderID);
-//
-//                    prefEditor.putString("USER_COOKIE",cookie);
-//                    prefEditor.putString("USER_PROVIDER_ID",userProviderID);
-//                    prefEditor.apply();
-//                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-//                    LoginWebActivity.this.finish();
-//                    return true;
+            public void onPageFinished(WebView view, String url) {
+//                String key = "/auth/user/logout";
+//                if(url.contains(key)){
+                Toast.makeText(LogoutWebActivity.this, "You're Already Sign-out. Thanks.", Toast.LENGTH_SHORT).show();
+                prefEditor.clear();
+                prefEditor.apply();
+                startActivity(new Intent(LogoutWebActivity.this, MainActivity.class));
+                LogoutWebActivity.this.finish();
 //                }
-                return false;
-//                //return super.shouldOverrideUrlLoading(view, url);
+
             }
         });
         webView.loadUrl(url);

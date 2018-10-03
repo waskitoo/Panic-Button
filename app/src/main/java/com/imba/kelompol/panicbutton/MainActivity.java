@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        prefShared = getSharedPreferences(RoutesConf.API_SHARED_USER,0);
+        prefShared = getSharedPreferences(RoutesConf.API_SHARED_USER, 0);
         lblWTemp1 = findViewById(R.id.weatherTemp1);
         lblWLoc1 = findViewById(R.id.weatherLoc1);
         lblWTemp0 = findViewById(R.id.wheatherTemp);
@@ -111,49 +111,49 @@ public class MainActivity extends AppCompatActivity
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading....");
         progressDialog.show();
-        Log.d(NEWS_DATA_RESPONSE,"=== BEGIN ===");
+        Log.d(NEWS_DATA_RESPONSE, "=== BEGIN ===");
         EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
         Call<ArticleResponse> call = service.getListNews();
         call.enqueue(new Callback<ArticleResponse>() {
             @Override
             public void onResponse(Call<ArticleResponse> call, Response<ArticleResponse> response) {
                 progressDialog.dismiss();
-                Log.d(NEWS_DATA_RESPONSE,response.body().toString());
+                Log.d(NEWS_DATA_RESPONSE, response.body().toString());
                 generateRecyclerNews(response.body().getArticles());
             }
 
             @Override
             public void onFailure(Call<ArticleResponse> call, Throwable t) {
-                Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
+                Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
             }
         });
 
-        Call<Map<String,Object>> weatherCall = service.getCurrentWeather();
-        weatherCall.enqueue(new Callback<Map<String,Object>>() {
+        Call<Map<String, Object>> weatherCall = service.getCurrentWeather();
+        weatherCall.enqueue(new Callback<Map<String, Object>>() {
             @Override
-            public void onResponse(Call<Map<String,Object>> call, Response<Map<String,Object>> response) {
-                Map<String,Object> item = (Map)response.body().get("data");
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                Map<String, Object> item = (Map) response.body().get("data");
                 Log.d(WEATHER_DATA_RESPONSE, response.body().toString());
-                String temp,loc;
-                temp=((Map)item.get("main")).get("temp").toString();
-                loc=item.get("name").toString();
-                lblWTemp1.setText(temp+"℃");
+                String temp, loc;
+                temp = ((Map) item.get("main")).get("temp").toString();
+                loc = item.get("name").toString();
+                lblWTemp1.setText(temp + "℃");
                 lblWLoc1.setText(loc);
 
-                lblWTemp0.setText(temp+"℃");
+                lblWTemp0.setText(temp + "℃");
                 lblWLoc0.setText(loc);
             }
 
             @Override
-            public void onFailure(Call<Map<String,Object>> call, Throwable t) {
-                Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: "+t.getMessage());
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
             }
         });
         isiBerita = Arrays.asList(getResources().getStringArray(R.array.berita));
         sumberBerita = Arrays.asList(getResources().getStringArray(R.array.sumber));
-        recyclerView = (RecyclerView)findViewById(R.id.RVnews);
+        recyclerView = (RecyclerView) findViewById(R.id.RVnews);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new BeritaAdapter(isiBerita,sumberBerita, this);
+        mAdapter = new BeritaAdapter(isiBerita, sumberBerita, this);
         recyclerView.setAdapter(mAdapter);
 
         // User Mount
@@ -169,10 +169,10 @@ public class MainActivity extends AppCompatActivity
         }
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }else if (mLayout != null &&
+        } else if (mLayout != null &&
                 (mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED || mLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
             mLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        }else {
+        } else {
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
         }
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 500);
 
@@ -197,9 +197,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_login) {
-            startActivity(new Intent(this,LandingActivity.class));
-        }
-        else if(id == R.id.nav_logout){
+            startActivity(new Intent(this, LandingActivity.class));
+        } else if (id == R.id.nav_logout) {
             startActivity(new Intent(this, LogoutWebActivity.class));
         }
 //        else if (id == R.id.nav_gallery) {
@@ -218,6 +217,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
     //Swipe UP
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_toggle: {
                 if (mLayout != null) {
                     if (mLayout.getPanelState() != SlidingUpPanelLayout.PanelState.HIDDEN) {
@@ -261,37 +261,37 @@ public class MainActivity extends AppCompatActivity
 
 
     /*
-    * Functional
-    * */
-    private void generateRecyclerNews(List<Article> list){
+     * Functional
+     * */
+    private void generateRecyclerNews(List<Article> list) {
         mAdapter = new BeritaAdapter(list, this);
         recyclerView.setAdapter(mAdapter);
     }
 
 
-    private void callService(){
+    private void callService() {
         EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
         String userProviderId = prefShared.getString("USER_PROVIDER_ID", null);
-        Log.d("USER_PROVIDER_ID",userProviderId);
-        if(userProviderId!=null) {
+        Log.d("USER_PROVIDER_ID", "" + userProviderId);
+        if (userProviderId != null) {
             Call<Map<String, Object>> call = service.getUserLogged(userProviderId);
             call.enqueue(new Callback<Map<String, Object>>() {
                 @Override
                 public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
                     Map<String, Object> res = response.body();
-                if(res.get("status")!=null && (Boolean)res.get("status")==true && res.get("user")!=null){
-                    Map<String,Object> user = (Map)res.get("user");
-                    String html = "";
-                    html += "Name: "+user.get("name");
-                    html += "\nEmail: "+user.get("email");
-                    html += "\nID: "+user.get("provider_id");
-                    Log.d("USER_LOGIN","Info: "+html);
-                    showDialog(html, "User Login");
-                    setPropUserNav(""+user.get("name"),""+user.get("email"));
+                    if (res.get("status") != null && (Boolean) res.get("status") == true && res.get("user") != null) {
+                        Map<String, Object> user = (Map) res.get("user");
+                        String html = "";
+                        html += "Name: " + user.get("name");
+                        html += "\nEmail: " + user.get("email");
+                        html += "\nID: " + user.get("provider_id");
+                        Log.d("USER_LOGIN", "Info: " + html);
+                        //showDialog(html, "User Login");
+                        setPropUserNav("" + user.get("name"), "" + user.get("email"));
 
-                    navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                    navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
-                }
+                        navigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                        navigationView.getMenu().findItem(R.id.nav_logout).setVisible(true);
+                    }
                     Log.d("USER_LOGIN", "Info: " + res);
                 }
 
@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity
         dialog.show();
     }
 
-    private void setPropUserNav(String name, String email){
+    private void setPropUserNav(String name, String email) {
         lblNavUserEmail.setText(email);
         lblNavUserName.setText(name);
     }
