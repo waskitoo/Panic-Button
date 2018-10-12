@@ -1,17 +1,24 @@
 package com.imba.kelompol.panicbutton;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -60,7 +67,12 @@ public class MainActivity extends AppCompatActivity
     private TextView lblNavUserName, lblNavUserEmail;
     private RecyclerView recyclerView;
 
+    private ProgressDialog progressDialog;
     private SharedPreferences prefShared;
+    private EndpointEmeract service;
+
+    // Information
+    private Double lat, lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,47 +120,43 @@ public class MainActivity extends AppCompatActivity
         lblWLoc0 = findViewById(R.id.wheatherLoc);
 
         // Debug
-        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading....");
         progressDialog.show();
         Log.d(NEWS_DATA_RESPONSE, "=== BEGIN ===");
-        EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
-        Call<ArticleResponse> call = service.getListNews();
-        call.enqueue(new Callback<ArticleResponse>() {
-            @Override
-            public void onResponse(Call<ArticleResponse> call, Response<ArticleResponse> response) {
-                progressDialog.dismiss();
-                Log.d(NEWS_DATA_RESPONSE, response.body().toString());
-                generateRecyclerNews(response.body().getArticles());
-            }
+        service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
 
-            @Override
-            public void onFailure(Call<ArticleResponse> call, Throwable t) {
-                Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
-            }
-        });
-
-        Call<Map<String, Object>> weatherCall = service.getCurrentWeather();
-        weatherCall.enqueue(new Callback<Map<String, Object>>() {
-            @Override
-            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                Map<String, Object> item = (Map) response.body().get("data");
-                Log.d(WEATHER_DATA_RESPONSE, response.body().toString());
-                String temp, loc;
-                temp = ((Map) item.get("main")).get("temp").toString();
-                loc = item.get("name").toString();
-                lblWTemp1.setText(temp + "℃");
-                lblWLoc1.setText(loc);
-
-                lblWTemp0.setText(temp + "℃");
-                lblWLoc0.setText(loc);
-            }
-
-            @Override
-            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-                Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
-            }
-        });
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "GPS Permission Not Granted", Toast.LENGTH_SHORT).show();
+            //return;
+        }
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        assert lm != null;
+//        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, new LocationListener() {
+//            @Override
+//            public void onLocationChanged(Location location) {
+//                lat = location.getLatitude();
+//                lon = location.getLongitude();
+//                String latlon = TextUtils.join(",",new String[]{""+lat,""+lon});
+//                loadWeather(latlon);
+//            }
+//
+//            @Override
+//            public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderEnabled(String provider) {
+//
+//            }
+//
+//            @Override
+//            public void onProviderDisabled(String provider) {
+//
+//            }
+//        });
         isiBerita = Arrays.asList(getResources().getStringArray(R.array.berita));
         sumberBerita = Arrays.asList(getResources().getStringArray(R.array.sumber));
         recyclerView = (RecyclerView) findViewById(R.id.RVnews);
@@ -157,7 +165,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(mAdapter);
 
         // User Mount
-        callService();
+        //callService();
+
+        loadInformation();
     }
 
     @Override
@@ -315,5 +325,58 @@ public class MainActivity extends AppCompatActivity
     private void setPropUserNav(String name, String email) {
         lblNavUserEmail.setText(email);
         lblNavUserName.setText(name);
+    }
+
+    /*
+    * Load Information
+    * */
+    private void loadInformation(){
+        loadNews();
+        loadWeather(null);
+        callService();
+
+        progressDialog.dismiss();
+    }
+
+
+    private void loadNews() {
+        Call<ArticleResponse> call = service.getListNews();
+        call.enqueue(new Callback<ArticleResponse>() {
+            @Override
+            public void onResponse(Call<ArticleResponse> call, Response<ArticleResponse> response) {
+                Log.d(NEWS_DATA_RESPONSE, response.body().toString());
+                generateRecyclerNews(response.body().getArticles());
+            }
+
+            @Override
+            public void onFailure(Call<ArticleResponse> call, Throwable t) {
+                Log.d(NEWS_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
+            }
+        });
+    }
+
+    private void loadWeather(String latlon){
+        Call<Map<String, Object>> weatherCall = service.getCurrentWeather();
+        if(latlon!=null && !latlon.equals("")){weatherCall = service.getCurrentWeather(latlon);}
+        weatherCall.enqueue(new Callback<Map<String, Object>>() {
+            @Override
+            public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                Map<String, Object> item = (Map) response.body().get("data");
+                Log.d(WEATHER_DATA_RESPONSE, response.body().toString());
+                String temp, loc;
+                temp = ((Map) item.get("main")).get("temp").toString();
+                loc = item.get("name").toString();
+                lblWTemp1.setText(temp + "℃");
+                lblWLoc1.setText(loc);
+
+                lblWTemp0.setText(temp + "℃");
+                lblWLoc0.setText(loc);
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+                Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
+            }
+        });
     }
 }

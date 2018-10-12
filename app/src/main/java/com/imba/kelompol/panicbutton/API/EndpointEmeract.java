@@ -15,6 +15,7 @@ public interface EndpointEmeract {
     // Weather
     @GET("/api/weather")
     Call<Map<String,Object>> getCurrentWeather();
+    Call<Map<String,Object>> getCurrentWeather(@Query("latlon") String latlon);
 
     // News
     @GET("/api/news")
