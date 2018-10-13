@@ -29,9 +29,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.imba.kelompol.panicbutton.API.EndpointEmeract;
 import com.imba.kelompol.panicbutton.API.RetrofitClient;
 import com.imba.kelompol.panicbutton.API.RoutesConf;
@@ -43,6 +48,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity
 
     private final String NEWS_DATA_RESPONSE = "NEWS_DATA_RESPONSE";
     private final String WEATHER_DATA_RESPONSE = "WEATHER_DATA_RESPONSE";
+    private final String APP_PERMISSION = "APP_PERMISSONS";
 
     private List<String> sumberBerita;
     private List<String> isiBerita;
@@ -66,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private TextView lblNavUserName, lblNavUserEmail;
     private RecyclerView recyclerView;
+    private View btnPanic;
 
     private ProgressDialog progressDialog;
     private SharedPreferences prefShared;
@@ -73,6 +82,33 @@ public class MainActivity extends AppCompatActivity
 
     // Information
     private Double lat, lon;
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if(location!=null){
+                lat = location.getLatitude();
+                lon = location.getLongitude();
+
+                Log.d("LOCATION", "Location founded. Lat "+lat+" Lon "+lon);
+            }else{
+                Log.d("LOCATION", "Location not found.");
+            }
+        }
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,37 +162,6 @@ public class MainActivity extends AppCompatActivity
         Log.d(NEWS_DATA_RESPONSE, "=== BEGIN ===");
         service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "GPS Permission Not Granted", Toast.LENGTH_SHORT).show();
-            //return;
-        }
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        assert lm != null;
-//        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, new LocationListener() {
-//            @Override
-//            public void onLocationChanged(Location location) {
-//                lat = location.getLatitude();
-//                lon = location.getLongitude();
-//                String latlon = TextUtils.join(",",new String[]{""+lat,""+lon});
-//                loadWeather(latlon);
-//            }
-//
-//            @Override
-//            public void onStatusChanged(String provider, int status, Bundle extras) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderEnabled(String provider) {
-//
-//            }
-//
-//            @Override
-//            public void onProviderDisabled(String provider) {
-//
-//            }
-//        });
         isiBerita = Arrays.asList(getResources().getStringArray(R.array.berita));
         sumberBerita = Arrays.asList(getResources().getStringArray(R.array.sumber));
         recyclerView = (RecyclerView) findViewById(R.id.RVnews);
@@ -168,6 +173,22 @@ public class MainActivity extends AppCompatActivity
         //callService();
 
         loadInformation();
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "LOCATION PERMISSON DENIED.", Toast.LENGTH_LONG).show();
+        }else{
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1,10,mLocationListener);
+            Log.d("LOCATION__INFO","lat:"+lat+" lon:"+lon);
+        }
+
+        btnPanic=findViewById(R.id.btnPanic);
+        btnPanic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, MapsActivity.class));
+            }
+        });
     }
 
     @Override
@@ -208,8 +229,12 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_login) {
             startActivity(new Intent(this, LandingActivity.class));
-        } else if (id == R.id.nav_logout) {
+        }
+        else if (id == R.id.nav_logout) {
             startActivity(new Intent(this, LogoutWebActivity.class));
+        }
+        else if (id == R.id.nav_maps) {
+            startActivity(new Intent(this, MapsActivity.class));
         }
 //        else if (id == R.id.nav_gallery) {
 //
@@ -334,6 +359,7 @@ public class MainActivity extends AppCompatActivity
         loadNews();
         loadWeather(null);
         callService();
+        //loadLocation();
 
         progressDialog.dismiss();
     }
@@ -378,5 +404,71 @@ public class MainActivity extends AppCompatActivity
                 Log.d(WEATHER_DATA_RESPONSE, "Failed! Cause: " + t.getMessage());
             }
         });
+    }
+
+    private void loadLocation(){
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+                reloadLocation();
+//            }
+        //},0,1000);
+    }
+
+    private void reloadLocation(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "GPS Permission Not Granted", Toast.LENGTH_LONG).show();
+            //return;
+        }else {
+            Log.d(APP_PERMISSION, "Location Granted.");
+
+            FusedLocationProviderClient mFusedLocation = LocationServices.getFusedLocationProviderClient(this);
+            mFusedLocation.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null){
+                        // Do it all with location
+                        Log.d("My Current location", "Lat : " + location.getLatitude() + " Long : " + location.getLongitude());
+                        // Display in Toast
+                        Toast.makeText(MainActivity.this,
+                                "Lat : " + location.getLatitude() + " Long : " + location.getLongitude(),
+                                Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(MainActivity.this, "Location Not Found", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+//            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//            assert lm != null;
+//            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+//            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100, 10, new LocationListener() {
+//                @Override
+//                public void onLocationChanged(Location location) {
+//                    lat = location.getLatitude();
+//                    lon = location.getLongitude();
+//                    String latlon = TextUtils.join(",", new String[]{"" + lat, "" + lon});
+//                    loadWeather(latlon);
+//
+//                    Log.d("LOCATION_UPDATE","LatLon: "+latlon);
+//                }
+//
+//                @Override
+//                public void onStatusChanged(String provider, int status, Bundle extras) {
+//
+//                }
+//
+//                @Override
+//                public void onProviderEnabled(String provider) {
+//
+//                }
+//
+//                @Override
+//                public void onProviderDisabled(String provider) {
+//
+//                }
+//            });
+        }
     }
 }

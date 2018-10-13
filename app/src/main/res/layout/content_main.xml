@@ -62,7 +62,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:gravity="center">
+                android:gravity="center"
+                android:id="@+id/btnPanic"
+                >
 
                 <ImageView
                     android:id="@+id/PanicImage"
@@ -71,7 +73,7 @@
                     android:src="@drawable/button" />
 
                 <TextView
-                    android:id="@+id/myImageViewText"
+                    android:id="@+id/PanicText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/PanicImage"

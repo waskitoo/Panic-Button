@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group>
         <item
             android:id="@+id/nav_login"
             android:icon="@drawable/ic_menu_manage"
@@ -26,6 +26,12 @@
         <!--android:icon="@drawable/ic_menu_manage"-->
         <!--android:title="Tools" />-->
     </group>
+
+    <item
+        android:id="@+id/nav_maps"
+        android:icon="@drawable/ic_menu_gallery"
+        android:visible="false"
+        android:title="Maps" />
 
     <!--<item android:title="Communicate">-->
     <!--<menu>-->
