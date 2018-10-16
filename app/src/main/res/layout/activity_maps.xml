@@ -12,7 +12,12 @@
         android:id="@+id/mapMaps"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="280dp"
         tools:context="com.example.mapwithmarker.MapsMarkerActivity" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listMapsHistory"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
