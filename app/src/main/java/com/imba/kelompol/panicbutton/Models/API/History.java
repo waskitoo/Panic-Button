@@ -4,6 +4,8 @@ public class History {
     private String uuid;
     private String status;
     private String time;
+    private String type;
+    private String latlon;
 
     public String getUuid() {
         return uuid;
@@ -27,5 +29,21 @@ public class History {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLatlon() {
+        return latlon;
+    }
+
+    public void setLatlon(String latlon) {
+        this.latlon = latlon;
     }
 }

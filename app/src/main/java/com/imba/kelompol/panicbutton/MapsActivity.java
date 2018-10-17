@@ -140,6 +140,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     History h = new History();
                     h.setUuid(item.get("uuid").toString());
                     h.setTime(item.get("created_at").toString());
+                    h.setLatlon(item.get("latlon").toString());
+                    h.setType(item.get("type").toString());
                     h.setStatus(item.get("resolved_id")==null?"PENDING":item.get("resolved_id").toString());
                     data.add(h);
                 }
