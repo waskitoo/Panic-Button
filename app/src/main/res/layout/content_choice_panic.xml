@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    >
+
+    <Button
+        android:id="@+id/btnPanicOptionAmbulance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ambulance"
+        />
+
+    <Button
+        android:id="@+id/btnPanicOptionPolice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kantor Polisi"
+        />
+    <Button
+        android:id="@+id/btnPanicOptionFirefighter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pemadan Kebarakaran"
+        />
+</LinearLayout>

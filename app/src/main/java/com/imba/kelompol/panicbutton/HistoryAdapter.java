@@ -32,6 +32,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.lblUuid.setText(item.getUuid());
         holder.lblStatus.setText(item.getStatus());
         holder.lblTime.setText(item.getTime());
+        holder.lblLatlon.setText(item.getLatlon());
+        holder.lblType.setText(item.getType());
     }
 
     @Override
@@ -40,12 +42,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView lblUuid, lblStatus, lblTime;
+        private TextView lblUuid, lblStatus, lblTime, lblLatlon, lblType;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             lblUuid = (TextView) itemView.findViewById(R.id.itemHistoryUUID);
             lblStatus = (TextView) itemView.findViewById(R.id.itemHistoryStatus);
             lblTime = (TextView) itemView.findViewById(R.id.itemHistoryTime);
+            lblLatlon = (TextView) itemView.findViewById(R.id.itemLatlon);
+            lblType = (TextView) itemView.findViewById(R.id.itemType);
         }
     }
 }

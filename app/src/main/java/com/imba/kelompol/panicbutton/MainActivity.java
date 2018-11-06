@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,8 +30,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,6 +80,9 @@ public class MainActivity extends AppCompatActivity
     private TextView lblNavUserName, lblNavUserEmail;
     private RecyclerView recyclerView;
     private View btnPanic;
+    private PopupWindow menuPanicOptions;
+    private AlertDialog.Builder alertPanic;
+    private View popupPanic;
 
     private ProgressDialog progressDialog;
     private SharedPreferences prefShared;
@@ -177,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(mAdapter);
 
         // User Mount
-        //callService();
+        //callService(
 
         loadInformation();
 
@@ -189,30 +195,22 @@ public class MainActivity extends AppCompatActivity
             //
         }
 
+        popupPanic=this.getLayoutInflater().inflate(R.layout.content_choice_panic,null);
+//        menuPanicOptions=new PopupWindow(popupPanic);
+//        menuPanicOptions.setAnimationStyle(android.R.style.Animation_Dialog);
+
+        alertPanic = new AlertDialog.Builder(this);
+        alertPanic.setView(popupPanic);
+        alertPanic.create();
+        //menuPanicOptions.showAtLocation(popupPanic, Gravity.CENTER,0,0);
         btnPanic=findViewById(R.id.btnPanic);
         btnPanic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Clicked
-                String userProviderId = prefShared.getString("USER_PROVIDER_ID", null);
-                if(userProviderId!=null){
-                    EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
-                    String latlon = "";
-                    if(_location!=null){latlon=TextUtils.join(",",new String[]{""+_location.getLatitude(),""+_location.getLongitude()});}
-                    Call<Map<String,Object>> call = service.sendPanic(""+userProviderId,latlon,"1");
-                    call.enqueue(new Callback<Map<String, Object>>() {
-                        @Override
-                        public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
-                            Log.d("SEND_PANIC",""+response.body());
-                            Toast.makeText(MainActivity.this, "Request Sent", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onFailure(Call<Map<String, Object>> call, Throwable t) {
-
-                        }
-                    });
-                }
+                //sendPanicAct(type);
+                //menuPanicOptions.showAtLocation(popupPanic, Gravity.CENTER,0,0);
+                alertPanic.show();
             }
         });
     }
@@ -457,4 +455,25 @@ public class MainActivity extends AppCompatActivity
         },0,5000);
     }
 
+    private void sendPanicAct(String type){
+        String userProviderId = prefShared.getString("USER_PROVIDER_ID", null);
+        if(userProviderId!=null){
+            EndpointEmeract service = RetrofitClient.getRetrofitInstance().create(EndpointEmeract.class);
+            String latlon = "";
+            if(_location!=null){latlon=TextUtils.join(",",new String[]{""+_location.getLatitude(),""+_location.getLongitude()});}
+            Call<Map<String,Object>> call = service.sendPanic(""+userProviderId,latlon,type);
+            call.enqueue(new Callback<Map<String, Object>>() {
+                @Override
+                public void onResponse(Call<Map<String, Object>> call, Response<Map<String, Object>> response) {
+                    Log.d("SEND_PANIC",""+response.body());
+                    Toast.makeText(MainActivity.this, "Request Sent", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Call<Map<String, Object>> call, Throwable t) {
+
+                }
+            });
+        }
+    }
 }
